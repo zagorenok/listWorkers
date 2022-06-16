@@ -1,0 +1,39 @@
+body {
+    background-color: antiquewhite;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 50vh;
+    text-align: center;
+}
+
+h1 {
+    margin: 0;
+    margin-bottom: .9rem;
+}
+
+.currency-title {
+    margin-bottom: .5rem;
+    font-weight: bold;
+}
+
+.currency-value {
+    margin-bottom: .7rem;
+}
+
+.input {
+    border:  2px solid #333;
+    border-radius: .3em;
+    padding: .25rem;
+    width: 7em;
+}
+
+select {
+    margin-left: .5rem;
+}
+
+.equals {
+    font-weight: bold;
+    font-size: 2rem;
+}
