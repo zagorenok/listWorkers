@@ -1,89 +1,127 @@
-import React, { useEffect, useState } from "react";
-import "./App.css";
-import CurrencyRow from "./CurrencyRow";
+import React, { useState } from 'react';
+import { nanoid } from 'nanoid';
+import './App.css';
+import data from './mock-data.json';
 
-const BASE_URL = "https://api.exchangerate.host/latest";
+ const App = () => {
+   const [workers, setWorkers] = useState(data);
+   const [addFormData, setAddFormData] = useState({
+     name: '',
+     surname: '',
+     department: '',
+     salary: '',
+   });
+  
+   const handleAddFormChange = (event) => {
+     event.preventDefault();
+     const fieldName = event.target.getAttribute('name');
+     const fieldValue = event.target.value;
+     const newFormData = { ...addFormData };
+     newFormData[fieldName] = fieldValue;
+     setAddFormData(newFormData);
+   };
 
-function App() {
-  const [currencyOptions, setCurrencyOptions] = useState([]);
-  const [fromCurrency, setFromCurrency] = useState();
-  const [toCurrency, setToCurrency] = useState();
-  const [exchangeRate, setExchangeRate] = useState();
-  const [amount, setAmount] = useState(1);
-  const [amountInFromCurrency, setAmountInFromCurrency] = useState(true);
-  const [currencyUSD, setCurrencyUSD] = useState();
-  const [currencyUAH, setCurrencyUAH] = useState();
+   const handleAddFormSubmit = (event) => {
+     event.preventDefault();
+     const newWorker = {
+       id: nanoid(),
+       name: addFormData.name,
+       surname: addFormData.surname,
+       department: addFormData.department,
+       salary: addFormData.salary,
+     };
+     const newWorkers = [...workers, newWorker];
+     setWorkers(newWorkers);
+   };
 
-  let toAmount, fromAmount;
-  if (amountInFromCurrency) {
-    fromAmount = amount;
-    toAmount = amount * exchangeRate;
-  } else {
-    toAmount = amount;
-    fromAmount = amount / exchangeRate;
-  }
-
-  useEffect(() => {
-    fetch(BASE_URL)
-      .then((res) => res.json())
-      .then((data) => {
-        const firstCurrency = Object.keys(data.rates)[0];
-        setCurrencyOptions([data.base, ...Object.keys(data.rates)]);
-        setFromCurrency(data.base);
-        setToCurrency(firstCurrency);
-        setExchangeRate(data.rates[firstCurrency]);
-        const currencyUSD = data.rates.USD;
-        const currencyUAH = data.rates.UAH;
-        setCurrencyUSD(currencyUSD);
-        setCurrencyUAH(currencyUAH);
-      });
-  }, []);
-
-  useEffect(() => {
-    if (fromCurrency != null && toCurrency != null) {
-      fetch(`${BASE_URL}?base=${fromCurrency}&symbols=${toCurrency}`)
-        .then((res) => res.json())
-        .then((data) => setExchangeRate(data.rates[toCurrency]));
-    }
-  }, [fromCurrency, toCurrency]);
+   const sumSalaries = data.reduce((sum, value) => (sum + parseFloat(value.salary)), 0);
+   const departmentIT = data.filter(el => el.department.includes('IT'));
+   const sumIT = departmentIT.reduce((sum, value) => sum + parseFloat(value.salary), 0);
+   const departmentSales = data.filter((el) => el.department.includes('Sales'));
+   const sumSales = departmentSales.reduce((sum, value) => sum + parseFloat(value.salary), 0); 
+   const departmentAdmin = data.filter((el) => el.department.includes('Administration'));
+   const sumAdmin = departmentAdmin.reduce((sum, value) => sum + parseFloat(value.salary), 0);
 
 
-  function handleFromAmountChange(e) {
-    setAmount(e.target.value);
-    setAmountInFromCurrency(true);
-  }
+   return (
+     <div className="app-container">
+       <table>
+         <thead>
+           <tr>
+             <th>firstName</th>
+             <th>lastName</th>
+             <th>department</th>
+             <th>salary</th>
+           </tr>
+         </thead>
+         <tbody>
+           {workers.map((worker) => (
+             <tr>
+               <td>{worker.name}</td>
+               <td>{worker.surname}</td>
+               <td>{worker.department}</td>
+               <td>{worker.salary}</td>
+             </tr>
+           ))}
+           <tr>
+             <td colSpan="2"></td>
+             <td>Summary</td>
+             <td>{sumSalaries}USD</td>
+           </tr>
+           <tr>
+             <td colSpan="2"></td>
+             <td>IT</td>
+             <td>{sumIT}USD</td>
+           </tr>
+           <tr>
+             <td colSpan="2"></td>
+             <td>Sales</td>
+             <td>{sumSales}USD</td>
+           </tr>
+           <tr>
+             <td colSpan="2"></td>
+             <td>Administration</td>
+             <td>{sumAdmin}USD</td>
+           </tr>
+         </tbody>
+       </table>
 
-  function handleToAmountChange(e) {
-    setAmount(e.target.value);
-    setAmountInFromCurrency(false);
-  }
-
-  return (
-    <>
-      <h1>Currency Conversion</h1>
-      <h3 className="currency-title">Курс USD</h3>
-      <div className="currency-value">{currencyUSD}</div>
-      <h3 className="currency-title">Курс UAH</h3>
-      <div className="currency-value">{currencyUAH}</div>
-      <CurrencyRow
-        currencyOptions={currencyOptions}
-        selectedCurrency={fromCurrency}
-        onChangeCurrency={(e) => setFromCurrency(e.target.value)}
-        onChangeAmount={handleFromAmountChange}
-        amount={fromAmount}
-      />
-      <div className="equals">=</div>
-      <CurrencyRow
-        currencyOptions={currencyOptions}
-        selectedCurrency={toCurrency}
-        onChangeCurrency={(e) => setToCurrency(e.target.value)}
-        onChangeAmount={handleToAmountChange}
-        amount={toAmount}
-      />
-    </>
-  );
-}
+       <h2>Add a worker</h2>
+       <form onSubmit={handleAddFormSubmit}>
+         <input
+           type="text"
+           name="name"
+           required="required"
+           placeholder="Enter a name..."
+           onChange={handleAddFormChange}
+         />
+         <input
+           type="text"
+           name="surname"
+           required="required"
+           placeholder="Enter a surname..."
+           onChange={handleAddFormChange}
+         />
+         <select name="department" onChange={handleAddFormChange}>
+           <option value="IT">IT</option>
+           <option value="Sales">Sales</option>
+           <option value="Administration">Administration</option>
+         </select>
+         <input
+           type="text"
+           name="salary"
+           required="required"
+           placeholder="Salary"
+           onChange={handleAddFormChange}
+         />
+         <button type="submit">Add</button>
+       </form>
+     </div>
+   );
+ };;
 
 export default App;
+
+
 
 
