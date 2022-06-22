@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/listWorkers/static/css/main.3d0acb20.css",
+    "main.js": "/listWorkers/static/js/main.8db93033.js",
+    "index.html": "/listWorkers/index.html",
+    "main.3d0acb20.css.map": "/listWorkers/static/css/main.3d0acb20.css.map",
+    "main.8db93033.js.map": "/listWorkers/static/js/main.8db93033.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.3d0acb20.css",
+    "static/js/main.8db93033.js"
+  ]
+}
